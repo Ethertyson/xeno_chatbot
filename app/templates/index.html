@@ -1,0 +1,97 @@
+<!-- Created by Pritanshu on 2025-06-01-->
+
+<!-- app/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Xeno Version1 - AI Style Chatbot</title>
+    <style>
+        h2 {text-align: center;font-size: 28px;font-weight: 300;font-family: "Trebuchet MS", Helvetica, sans-serif;color: white;text-shadow: 1px 1px 3px rgba(0,0,0,0.7);}
+        body {font-family: "Segoe UI", sans-serif;margin: 0;padding: 0;min-height: 100vh;background-image: url('/static/images/IMG3.jpg');background-size: cover; background-position: center; background-repeat: no-repeat; }
+        .container {background: rgba(0, 0, 0, 0.6);padding: 40px;border-radius: 10px;max-width: 600px;margin: 40px auto;}
+        textarea { width: 100%; height: 120px; margin-top: 10px; padding: 12px; font-size: 16px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.2); color: white; border: 1px solid #ccc; box-sizing: border-box; resize: vertical; }
+        textarea::placeholder {color: #cccccc;}
+        button { width: 100%; margin-top: 10px; padding: 12px; font-size: 18px; font-weight: bold; border-radius: 12px; background-color: rgba(173, 216, 230, 0.3); color: #ffffff; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; border: 1px solid rgba(255, 255, 255, 0.4); cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; backdrop-filter: blur(3px); } button:hover { background-color: rgba(173, 216, 230, 0.5); transform: scale(1.01); }
+        #responseBox { white-space: pre-wrap; background: rgba(30, 30, 30, 0.4); color: #ffffff; padding: 15px; border-radius: 10px; margin-top: 10px; text-align: center; font-family: "Segoe UI", "Verdana", sans-serif; font-weight: 300; font-size: 18px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); opacity: 0.8; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <h2>Xeno Version1 - AI Style Chatbot</h2>
+    <textarea id="userInput" rows="3" placeholder="Type your question here..."></textarea>
+    <button onclick="sendMessage()">Send</button>
+    <div id="responseBox">Xeno will answer you here.</div>
+
+    <script>
+        document.getElementById("userInput").addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.shiftKey) 
+        {
+            event.preventDefault(); // Prevent new line
+            sendMessage();          // Trigger the send function
+        }
+        });
+
+        let currentTimeout = null; // Store the current typing timer
+        let currentTyping = null;  // Store the current typing process
+        let isTyping = false;
+
+        async function sendMessage() {
+            const userInput = document.getElementById("userInput").value.trim();
+            const resBox = document.getElementById("responseBox");
+            const sendButton = document.querySelector("button");
+
+            if (!userInput || isTyping) return;
+
+            resBox.innerText = "Thinking...";
+            sendButton.disabled = true;
+            isTyping = true;
+
+            try {
+                const response = await fetch("/chatAiModel", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ "Message": userInput })
+                });
+                const data = await response.json();
+                const text = data.Message;
+
+                // Clear previous typing
+                if (currentTimeout) clearTimeout(currentTimeout);
+                if (currentTyping) clearTimeout(currentTyping);
+
+                // Delay before typing
+                currentTimeout = setTimeout(() => {
+                    typeWriterEffect(text, resBox, () => {
+                        sendButton.disabled = false;
+                        isTyping = false;
+                    });
+                }, 1000);
+            } catch (error) {
+                resBox.innerText = "Error connecting to chatbot API.";
+                sendButton.disabled = false;
+                isTyping = false;
+            }
+        }
+
+        function typeWriterEffect(text, element, callback) {
+            element.innerText = "";
+            let i = 0;
+            const speed = 30;
+
+            function type() {
+                if (i < text.length) {
+                    element.innerText += text.charAt(i);
+                    i++;
+                    currentTyping = setTimeout(type, speed);
+                } else {
+                    callback(); // re-enable Send button
+                }
+            }
+
+            type();
+        }
+    </script>
+    </div>
+</body>
+</html>
