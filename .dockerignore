@@ -15,3 +15,11 @@ Dockerfile.dev
 tests/
 .idea/
 .vscode/
+*.pt
+*.pkl
+*.csv
+*.json
+*.zip
+*.tar.gz
+models/
+datasets/
