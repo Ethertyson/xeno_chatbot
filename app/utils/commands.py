@@ -843,6 +843,18 @@ random_facts = {
 
 
 mysql_queries = {
+    # DBMS
+    "what is dbms": "DBMS stands for Database Management System, software that stores, manages, and allows access to databases efficiently.",
+    "explain database management system": "A DBMS manages data by providing an interface between users and databases, ensuring data consistency, security, and integrity.",
+    "define dbms": "DBMS is software that helps organize, retrieve, and manage data in databases.",
+    "what does dbms mean": "DBMS means Database Management System, a tool to handle data storage and retrieval.",
+
+    # MySQL
+    "what is mysql": "MySQL is an open-source relational database management system that uses SQL (Structured Query Language) to manage data.",
+    "explain mysql": "MySQL is a popular database software used for storing and managing data in tables with rows and columns.",
+    "what does mysql mean": "MySQL is a database system that helps applications store and query data quickly and reliably.",
+    "how to use mysql": "You use MySQL by writing SQL queries to create, read, update, and delete data stored in databases.",
+    
     # Create database
     "how do i create a database in mysql": "CREATE DATABASE database_name;",
     "command to create database in mysql": "CREATE DATABASE database_name;",
@@ -1747,18 +1759,6 @@ tech_info = {
     "what is the internet": "The Internet is a global network that connects millions of computers worldwide, allowing them to communicate and share information.",
     "tell me about internet": "The Internet is a vast system of interconnected computer networks that use the standard Internet protocol suite (TCP/IP) to link devices worldwide.",
     "explain internet to me": "The Internet is a worldwide network of networks that enables data sharing, communication, and access to information across the globe.",
-
-    # DBMS
-    "what is dbms": "DBMS stands for Database Management System, software that stores, manages, and allows access to databases efficiently.",
-    "explain database management system": "A DBMS manages data by providing an interface between users and databases, ensuring data consistency, security, and integrity.",
-    "define dbms": "DBMS is software that helps organize, retrieve, and manage data in databases.",
-    "what does dbms mean": "DBMS means Database Management System, a tool to handle data storage and retrieval.",
-
-    # MySQL
-    "what is mysql": "MySQL is an open-source relational database management system that uses SQL (Structured Query Language) to manage data.",
-    "explain mysql": "MySQL is a popular database software used for storing and managing data in tables with rows and columns.",
-    "what does mysql mean": "MySQL is a database system that helps applications store and query data quickly and reliably.",
-    "how to use mysql": "You use MySQL by writing SQL queries to create, read, update, and delete data stored in databases.",
 
     # Python
     "what is python": "Python is a high-level, interpreted programming language known for its readability and wide range of applications.",
