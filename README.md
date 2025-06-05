@@ -7,14 +7,39 @@ A minimalist, full-stack AI chatbot project built using **Flask** (Python) and *
 [View Live App](https://xenochatbot-production.up.railway.app/)
 
 ## Tech Stack
-Python, Flask, Javascript, OOP, HTML, CSS, Railway, SentenceTransformer, templates, Docker, Util, AI Model
+Python, Flask, Javascript, OOP, HTML, CSS, Railway, SentenceTransformer, templates, Docker, Util, Mini AI Model
 
 ## Features
-- Built a modular, production-ready, and backend focused full stack AI Style Chatbot using Python and Flask REST API.
-- Pushed code to GitHub for automated deployment enabling smooth CI/CD flow. Integrated Google News API.
-- Implemented blueprints, decorators, factory patterns, and templates for interactive UI using HTML, CSS, and Javascript.
-- Used mini AI model from SentenceTransformer for semantic matches. Implemented Rule based logic.
-- Created virtual environment, dockerized and deployed on Railway with secure environment variable management.
+### Smart NLP Input Parsing
+- Supports natural language queries like "add five and twenty" or "bitwise xor of 5 and 9".
+- Automatically converts number words to digits using word2number.
+
+### Semantic & Symbolic Operator Recognition
+- Detects and evaluates both keywords (add, power, bitwise xor) and symbols (+, **, ^).
+- Handles mathematical and bitwise operations intelligently.
+
+### Safe Expression Evaluation with numexpr
+- Supports direct expression inputs like 2*3+5/2 using optimized evaluation.
+- Includes fallback logic for operator-based expressions.
+
+### Bitwise Operation Support
+- Supports AND, XOR, NOT, LEFT SHIFT, RIGHT SHIFT with various input styles.
+- Recognizes multiple keyword variations like "bitwise xor", "<<", "right shift", etc.
+
+### Timezone-Aware Date & Time Handling
+- Returns Indian date/time (Asia/Kolkata) regardless of server location.
+- Commands like "get current time" or "get date and time" return localized output.
+
+### Semantic Intent Matching with Sentence Transformers
+- Uses sentence-transformers (MiniLM) for best-fit query matching.
+- Handles topics like Windows, Linux, GitHub, PowerShell, MySQL, and computer science concepts.
+
+### Fallback to Basic Assistant Mode
+- Provides predefined assistant responses when semantic intent match is weak.
+- Responds with friendly prompts and guidance messages.
+
+### Expandable Command Dictionary
+- Command database easily extendable and organized by category (windows_cmds, news_queries, etc.).
 
 ## Getting Started (Local Setup)
 ### 1. Clone the repo
