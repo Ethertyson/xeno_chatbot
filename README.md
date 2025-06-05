@@ -41,6 +41,15 @@ Python, Flask, Javascript, OOP, HTML, CSS, Railway, SentenceTransformer, templat
 ### Expandable Command Dictionary
 - Command database easily extendable and organized by category (windows_cmds, news_queries, etc.).
 
+## Additional Highlights
+- Modular, production-ready backend-focused AI-style chatbot built with Python and Flask REST API.
+- Integrated Google News API for live news fetching.
+- Utilizes Flask blueprints, decorators, and factory pattern for clean project structure.
+- Frontend implemented with HTML, CSS, and JavaScript for interactive UI.
+- Uses lightweight MiniLM model from SentenceTransformer for semantic NLP.
+- Deployed with Docker and Railway, managing secure environment variables.
+- CI/CD workflow enabled with automated GitHub pushes.
+
 ## Getting Started (Local Setup)
 ### 1. Clone the repo
 ```bash
