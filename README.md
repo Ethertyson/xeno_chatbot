@@ -124,7 +124,7 @@ API Endpoint: /chatAiModel  # Http Method should be POST
 }
 ```
 
-## Project Structure
+## Project Architecture
 - chatbot_api        # root directory
 - chatbot_api/run.py
 - chatbot_api/venv
