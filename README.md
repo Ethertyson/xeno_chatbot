@@ -142,5 +142,8 @@ API Endpoint: /chatAiModel  # Http Method should be POST
 ## License
 This project is licensed under the MIT License — meaning you’re free to use, modify, and distribute the code with proper credit. The software is provided “as is” without any warranty. Feel free to use this chatbot offline or integrate it into your own projects!
 
+## Note
+This is an independent project licensed under MIT. Not affiliated with any existing product or brand named ‘Xeno’.
+
 ## Author
 Pritanshu Srivastava | pritanshusrivastava24880@gmail.com | [LinkedIn](https://www.linkedin.com/in/pritanshu-srivastava-59aaa7226/) | [HackerRank](hackerrank.com/profile/pritanshusrivas1)
