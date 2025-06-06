@@ -41,6 +41,9 @@ Python, Flask, Javascript, OOP, HTML, CSS, Railway, SentenceTransformer, templat
 ### Expandable Command Dictionary
 - Command database easily extendable and organized by category (windows_cmds, news_queries, etc.).
 
+### Offline Ready
+- Once installed on your desktop, the chatbot runs completely offline using a lightweight Mini LLM model. All responses are served from a local dictionary — no external API calls required (except optional Google News API for live news).
+
 ## Additional Highlights
 - Modular, production-ready backend-focused AI-style chatbot built with Python and Flask REST API.
 - Integrated Google News API for live news fetching.
