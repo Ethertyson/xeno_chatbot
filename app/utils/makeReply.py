@@ -1,6 +1,6 @@
 # Created by Pritanshu on 2025-05-31
 
-from sentence_transformers import util
+from sentence_transformers import SentenceTransformer, util
 from app.utils import commands
 from app.utils.findNews import fetchLatestNews
 from datetime import datetime,date
@@ -9,23 +9,14 @@ from functools import reduce
 import numexpr as ner
 import pytz
 
-model = None
-
-def get_model():
-    global model
-    if model is None:
-        from sentence_transformers import SentenceTransformer
-        model = SentenceTransformer('all-MiniLM-L6-v2')
-    return model
-
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 allTopicCommandsDict = {**commands.windows_cmds,**commands.linux_cmds,**commands.macos_cmds,**commands.github_cmds,**commands.mysql_queries,**commands.random_facts,**commands.powershell_cmds,**commands.cs_concepts,**commands.news_queries,**commands.time_date_queries}
 
 allCmdSemanticKeys = list(allTopicCommandsDict.keys())
+allCmdSemanticEmbeddings = model.encode(allCmdSemanticKeys,convert_to_tensor=True)
 
 def fetchBestReply(userInput):
-    model = get_model()
-    allCmdSemanticEmbeddings = model.encode(allCmdSemanticKeys,convert_to_tensor=True)
 
     userInputEmbedding = model.encode(userInput,convert_to_tensor=True)
     matchScores = util.cos_sim(userInputEmbedding,allCmdSemanticEmbeddings)
@@ -52,10 +43,9 @@ def fetchBestReply(userInput):
 initialCommandsDict = {**commands.basic_cmds,**commands.assistant_role_responses,**commands.creator_queries,**commands.identity_responses,**commands.internet_info,**commands.tech_info,**commands.common_searches,**commands.nature_facts,**commands.most_searches}
 
 basicCommandKeys = list(initialCommandsDict.keys())
+basicCmdSemanticEmbeddings = model.encode(basicCommandKeys,convert_to_tensor=True)
 
 def fetchBasicReply(userInput):
-    model = get_model()
-    basicCmdSemanticEmbeddings = model.encode(basicCommandKeys,convert_to_tensor=True)
 
     userInputEmbedding = model.encode(userInput,convert_to_tensor=True)
     matchScores = util.cos_sim(userInputEmbedding,basicCmdSemanticEmbeddings)
