@@ -20,7 +20,7 @@ ENV FLASK_APP=run.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the app
-CMD ["python", "run.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "run:app"]
 
 # Label for the service
 LABEL railway.service="web"
