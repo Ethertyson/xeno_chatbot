@@ -21,3 +21,6 @@ ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the app
 CMD ["python", "run.py"]
+
+# Label for the service
+LABEL railway.service="web"
