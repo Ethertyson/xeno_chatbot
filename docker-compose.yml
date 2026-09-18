@@ -1,0 +1,15 @@
+services:
+  xeno:
+    image: xeno-chatbot:latest
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: xeno
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - ./logs:/app/logs

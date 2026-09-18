@@ -1,20 +1,41 @@
 # Created by Pritanshu on 2025-05-31
 
+from app.utils.memory_utils import log_memory
+
+log_memory("makeReply.py - before imports")
+
 from sentence_transformers import SentenceTransformer, util
+
+log_memory("makeReply.py - after sentence_transformers import")
+
 from app.utils import commands
+
+log_memory("makeReply.py - after commands import")
+
 from app.utils.findNews import fetchLatestNews
+
+log_memory("makeReply.py - after findNews import")
+
 from datetime import datetime,date
 import re
 from functools import reduce
 import numexpr as ner
 import pytz
 
+log_memory("makeReply.py - after remaining imports")
+
+log_memory("makeReply.py initialization")
+
+log_memory("Before SentenceTransformer")
 model = SentenceTransformer('all-MiniLM-L6-v2')
+log_memory("After SentenceTransformer")
 
 allTopicCommandsDict = {**commands.windows_cmds,**commands.linux_cmds,**commands.macos_cmds,**commands.github_cmds,**commands.mysql_queries,**commands.random_facts,**commands.powershell_cmds,**commands.cs_concepts,**commands.news_queries,**commands.time_date_queries}
 
 allCmdSemanticKeys = list(allTopicCommandsDict.keys())
+log_memory("Before topic embeddings")
 allCmdSemanticEmbeddings = model.encode(allCmdSemanticKeys,convert_to_tensor=True)
+log_memory("After topic embeddings")
 
 def fetchBestReply(userInput):
 
@@ -43,7 +64,11 @@ def fetchBestReply(userInput):
 initialCommandsDict = {**commands.basic_cmds,**commands.assistant_role_responses,**commands.creator_queries,**commands.identity_responses,**commands.internet_info,**commands.tech_info,**commands.common_searches,**commands.nature_facts,**commands.most_searches}
 
 basicCommandKeys = list(initialCommandsDict.keys())
+log_memory("Before basic embeddings")
 basicCmdSemanticEmbeddings = model.encode(basicCommandKeys,convert_to_tensor=True)
+log_memory("After basic embeddings")
+
+log_memory("makeReply.py loaded")
 
 def fetchBasicReply(userInput):
 
