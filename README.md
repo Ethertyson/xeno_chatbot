@@ -279,9 +279,7 @@ xeno_chatbot/
 ├── app/
 │   │
 │   ├── models/
-│   │   └── all-MiniLM-L6-v2/
-│   │       ├── model.onnx
-│   │       └── tokenizer.json
+│   │   └── chatBot.py
 │   │
 │   ├── routes/
 │   │
@@ -299,6 +297,10 @@ xeno_chatbot/
 │
 ├── models/
 │   └── xeno_commands.npz
+│   │
+│   └── all-MiniLM-L6-v2/
+│           ├── model.onnx
+│           └── tokenizer.json
 │
 ├── scripts/
 │   └── embedding_builder/
@@ -466,7 +468,7 @@ POST /chatAiModel
 
 ```json
 {
-    "message": "how do I create a database in mysql"
+    "message": "how do i create a table in mysql"
 }
 ```
 
@@ -474,7 +476,12 @@ POST /chatAiModel
 
 ```json
 {
-    "response": "CREATE DATABASE database_name;"
+    "response": "CREATE TABLE table_name (
+    column1 datatype,
+    column2 datatype,
+    column3 datatype,
+    PRIMARY KEY (column1)
+);"
 }
 ```
 
@@ -758,7 +765,7 @@ Examples:
 
 ```text
 What is a database?
-How do I create a database in MySQL?
+How do I create a table in mysql?
 What command creates a table in MySQL?
 What is the current time?
 What is today's date?
