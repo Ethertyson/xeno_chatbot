@@ -1,7 +1,11 @@
 # Created by Pritanshu on 2025-05-28
+from app.utils.memory_utils import log_memory
+log_memory("app/__init__.py - start")
 
 from flask import Flask
 from app.routes.chat_routes import chatbot_routes
+
+log_memory("app/__init__.py - after imports")
 
 def create_app():
 
@@ -12,5 +16,7 @@ def create_app():
 
     #Register Routes
     app.register_blueprint(chatbot_routes)
+
+    log_memory("app/__init__.py - app initialized")
 
     return app

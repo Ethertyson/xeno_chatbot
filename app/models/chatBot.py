@@ -1,9 +1,15 @@
 #Created by Pritanshu on 2025-05-28
 
+from app.utils.memory_utils import log_memory
+log_memory("chatBot.py - start")
+
 from flask import jsonify
 import re
 from app.utils.makeReply import fetchBestReply,fetchBasicReply,numberClaculationReply,expressionCalculationReply
 from word2number import w2n
+
+log_memory("chatBot.py - after imports")
+
 class startChat:
 
     notOperatorKeywords = ['bitwise not', 'bitwise ~','bitwisenot', 'bitwise~','~']

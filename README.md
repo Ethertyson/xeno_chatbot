@@ -1,152 +1,819 @@
-# Xeno Version1 – AI Style Chatbot – Backend Focused Full Stack Application
+# Xeno Version 2 – Lightweight AI Style Chatbot
 
-## Overview
-A minimalist, full-stack AI chatbot project built using **Flask** (Python) and **SentenceTransformer(Mini AI Model)** on the backend and **HTML + JavaScript** on the frontend. It supports REST API, and a styled frontend that simulates AI response typing.
+Backend-focused full-stack chatbot application built with **Python, Flask, semantic search, ONNX Runtime, and a lightweight NLP pipeline**.
 
-## Live Demo
-[View Live App](https://xenochatbot-production.up.railway.app/)
+Xeno V2 focuses on reducing production memory usage while preserving the existing chatbot functionality and semantic command-matching behavior.
 
-## Tech Stack
-Python, Flask, Javascript, OOP, HTML, CSS, Railway, SentenceTransformer, templates, Docker, Util, Mini AI Model
+---
 
-## Features
-### Smart NLP Input Parsing
-- Supports natural language queries like "add five and twenty" or "bitwise xor of 5 and 9".
-- Automatically converts number words to digits using word2number.
+## 🚀 Overview
 
-### Semantic & Symbolic Operator Recognition
-- Detects and evaluates both keywords (add, power, bitwise xor) and symbols (+, **, ^).
-- Handles mathematical and bitwise operations intelligently.
+Xeno is an AI-style chatbot capable of understanding natural-language commands and mapping them to predefined responses.
 
-### Safe Expression Evaluation with numexpr
-- Supports direct expression inputs like 2*3+5/2 using optimized evaluation.
-- Includes fallback logic for operator-based expressions.
+The project originally used `SentenceTransformer` and PyTorch for semantic command matching. In **Xeno V2**, the production inference pipeline was redesigned using:
 
-### Bitwise Operation Support
-- Supports AND, XOR, NOT, LEFT SHIFT, RIGHT SHIFT with various input styles.
-- Recognizes multiple keyword variations like "bitwise xor", "<<", "right shift", etc.
+- **ONNX Runtime**
+- **MiniLM (`all-MiniLM-L6-v2`)**
+- **Hugging Face Tokenizers**
+- **NumPy**
+- **Precomputed command embeddings**
+- **NumPy cosine-similarity search**
 
-### Timezone-Aware Date & Time Handling
-- Returns Indian date/time (Asia/Kolkata) regardless of server location.
-- Commands like "get current time" or "get date and time" return localized output.
+This significantly reduces the memory footprint of the production application.
 
-### Semantic Intent Matching with Sentence Transformers
-- Uses sentence-transformers (MiniLM) for best-fit query matching.
-- Handles topics like Windows, Linux, GitHub, PowerShell, MySQL, and computer science concepts.
+---
 
-### Fallback to Basic Assistant Mode
-- Provides predefined assistant responses when semantic intent match is weak.
-- Responds with friendly prompts and guidance messages.
+## ✨ Features
 
-### Expandable Command Dictionary
-- Command database easily extendable and organized by category (windows_cmds, news_queries, etc.).
+- 🤖 Smart natural-language input parsing
+- 🧠 Semantic command matching
+- 🔎 Lightweight semantic search
+- ⚡ ONNX-based sentence embedding generation
+- 📦 Precomputed command embeddings
+- 🧮 Mathematical expression evaluation
+- 🔢 Number and operator recognition
+- ⚙️ Bitwise operations
+- 🕐 Timezone-aware date and time responses
+- 🌐 News search integration
+- 💬 Basic assistant/chatbot responses
+- 🧩 Expandable command dictionary
+- 🐳 Docker support
+- 🚂 Railway deployment support
+- 📊 Memory and performance monitoring
+- 📴 Offline semantic command matching
+- 🛠️ Dedicated embedding-builder utility
 
-### Offline Ready
-- Once installed on your desktop, the chatbot runs completely offline using a lightweight Mini LLM model. All responses are served from a local dictionary — no external API calls required (except optional Google News API for live news).
+---
 
-## Additional Highlights
-- Modular, production-ready backend-focused AI-style chatbot built with Python and Flask REST API.
-- Integrated Google News API for live news fetching.
-- Utilizes Flask blueprints, decorators, and factory pattern for clean project structure.
-- Frontend implemented with HTML, CSS, and JavaScript for interactive UI.
-- Uses lightweight MiniLM model from SentenceTransformer for semantic NLP.
-- Deployed with Docker and Railway, managing secure environment variables.
-- CI/CD workflow enabled with automated GitHub pushes.
+## 🧠 Xeno V2 – Resource Optimization
 
-## Getting Started (Local Setup)
-### 1. Clone the repo
+The main goal of V2 was to reduce the memory consumption of the semantic-matching system.
+
+### V1
+
+The original implementation loaded:
+
+```text
+SentenceTransformer
+        ↓
+PyTorch
+        ↓
+all-MiniLM-L6-v2
+        ↓
+Generate embeddings for all commands at startup
+```
+
+This resulted in approximately:
+
+```text
+~804 MB RSS
+```
+
+during application initialization.
+
+### V2
+
+The production implementation now uses:
+
+```text
+User Query
+    ↓
+Tokenizer
+    ↓
+ONNX Runtime
+    ↓
+MiniLM Embedding
+    ↓
+NumPy Cosine Similarity
+    ↓
+Precomputed Command Embeddings
+    ↓
+Best Matching Command
+```
+
+Production startup memory was reduced to approximately:
+
+```text
+~202 MB RSS
+```
+
+This represents approximately a **75% reduction in observed startup memory usage** compared with the previous implementation.
+
+---
+
+## 🔍 Semantic Search Architecture
+
+Xeno contains approximately **1,522 predefined semantic commands**:
+
+```text
+Topic Commands : 1,036
+Basic Commands :   486
+-----------------------
+Total           : 1,522
+```
+
+Instead of generating embeddings for all commands every time the application starts, the embeddings are generated once and stored as a NumPy `.npz` file.
+
+### Production flow
+
+```text
+User Input
+    │
+    ▼
+Tokenizer
+    │
+    ▼
+ONNX Runtime
+    │
+    ▼
+Query Embedding
+    │
+    ▼
+NumPy Similarity Search
+    │
+    ▼
+Precomputed Command Embeddings
+    │
+    ▼
+Best Matching Command
+    │
+    ▼
+Chatbot Response
+```
+
+The stored embeddings use:
+
+```text
+Model       : all-MiniLM-L6-v2
+Dimensions  : 384
+Data Type   : float32
+Similarity  : Cosine Similarity
+Storage     : NumPy NPZ
+```
+
+The embeddings are normalized before storage, allowing cosine similarity to be calculated efficiently using a dot product.
+
+---
+
+## 📦 Precomputed Command Embeddings
+
+The generated embedding file is:
+
+```text
+models/xeno_commands.npz
+```
+
+It contains:
+
+```text
+topic_commands
+topic_embeddings
+
+basic_commands
+basic_embeddings
+```
+
+Expected shapes:
+
+```text
+Topic Commands      : (1036,)
+Topic Embeddings    : (1036, 384)
+
+Basic Commands      : (486,)
+Basic Embeddings    : (486, 384)
+```
+
+The generated file is approximately **2.1 MB**, making it significantly smaller and more deployment-friendly than generating and storing embeddings dynamically at application startup.
+
+---
+
+## 🛠️ Embedding Builder
+
+Embedding generation is separated from the production application.
+
+The embedding builder is a dedicated Docker utility that uses `SentenceTransformer` only during the offline embedding-generation process.
+
+Production does **not** load SentenceTransformer or PyTorch.
+
+### Builder architecture
+
+```text
+Command Dictionary
+        │
+        ▼
+SentenceTransformer
+        │
+        ▼
+all-MiniLM-L6-v2
+        │
+        ▼
+Normalized Embeddings
+        │
+        ▼
+xeno_commands.npz
+```
+
+The builder is located at:
+
+```text
+scripts/embedding_builder/
+```
+
+and uses:
+
+```text
+docker/embedding-builder/Dockerfile
+```
+
+Builder dependencies are kept separate from the production requirements.
+
+---
+
+## 🧰 Tech Stack
+
+### Backend
+
+- Python
+- Flask
+- REST API
+- Object-Oriented Programming
+
+### AI / NLP
+
+- ONNX Runtime
+- Hugging Face Tokenizers
+- `all-MiniLM-L6-v2`
+- NumPy
+- Semantic Search
+- Sentence Embeddings
+
+### Utilities
+
+- NumExpr
+- Word2Number
+- pytz
+- psutil
+
+### Frontend
+
+- HTML
+- CSS
+- JavaScript
+
+### Database / Backend Infrastructure
+
+- SQLAlchemy
+
+### Deployment
+
+- Docker
+- Railway
+
+---
+
+## 📁 Project Structure
+
+```text
+xeno_chatbot/
+│
+├── app/
+│   │
+│   ├── models/
+│   │   └── all-MiniLM-L6-v2/
+│   │       ├── model.onnx
+│   │       └── tokenizer.json
+│   │
+│   ├── routes/
+│   │
+│   ├── static/
+│   │
+│   ├── templates/
+│   │
+│   ├── utils/
+│   │   ├── embedding_service.py
+│   │   ├── command_embeddings.py
+│   │   ├── semantic_search.py
+│   │   └── memory_utils.py
+│   │
+│   └── __init__.py
+│
+├── models/
+│   └── xeno_commands.npz
+│
+├── scripts/
+│   └── embedding_builder/
+│       ├── build_command_embeddings.py
+│       └── commands.py
+│
+├── docker/
+│   └── embedding-builder/
+│       └── Dockerfile
+│
+├── run.py
+├── config.py
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── requirements-embedding.txt
+└── .dockerignore
+```
+
+---
+
+## ⚙️ Local Setup
+
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/Ethertyson/xeno_chatbot.git
 cd xeno_chatbot
 ```
 
-### 2. Set up virtual environment
+### 2. Create a virtual environment
+
+#### Windows
+
 ```bash
 python -m venv venv
-source venv/bin/activate   # or venv\Scripts\activate on Windows
-pip install -r requirements.txt # To install dependencies
+venv\Scripts\activate
 ```
 
-### 3. Setup environment variables (.env file):
-Create a .env file in the root directory with the following variables:
-- FLASK_ENV=development
-- GOOGLE_NEWS_API_KEY=your_key
-- GOOGLE_NEWS_API_HOST=google_news_api_host
+#### Linux / macOS
 
-### 4. Run the app locally:
 ```bash
-flask run	# OR python run.py
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-## Docker
-Build and run the Docker image:
+### 3. Install dependencies
+
 ```bash
-docker build -t xeno-chatbot .  # Build
-docker run -p 5000:5000 xeno-chatbot  # Run
+pip install -r requirements.txt
 ```
-## Deployment
-Deployed on Railway: https://xenochatbot-production.up.railway.app/
 
-## Deploy at your end
-- Push your code to GitHub
-- Connect your repo to Railway (or any other cloud platform)
-- Add required environment variables in Railway settings
-- Deploy and access your live URL
+---
 
-## API Documentation
-API Endpoint: /chatAiModel  # Http Method should be POST
-### Example1:
-#### INPUT
+## 🔐 Environment Variables
+
+Create/configure the required environment variables.
+
+Example:
+
+```env
+FLASK_ENV=development
+
+GOOGLE_NEWS_API_KEY=your_key
+GOOGLE_NEWS_API_HOST=google_news_api_host
+```
+
+Add any other environment-specific configuration required by the application.
+
+---
+
+## ▶️ Run the Application
+
+You can start the Flask application using:
+
+```bash
+python run.py
+```
+
+or:
+
+```bash
+flask run
+```
+
+The application will be available on:
+
+```text
+http://localhost:5000
+```
+
+---
+
+## 🐳 Docker
+
+### Build the application image
+
+```bash
+docker build -t xeno-chatbot .
+```
+
+### Run the application
+
+```bash
+docker run -p 5000:5000 xeno-chatbot
+```
+
+---
+
+## 🧪 Docker Compose
+
+The project also includes Docker Compose configuration for local development.
+
+Start the application:
+
+```bash
+docker compose up xeno
+```
+
+---
+
+## 🔨 Regenerating Command Embeddings
+
+The production application does not generate command embeddings during startup.
+
+If `models/xeno_commands.npz` needs to be regenerated, use the dedicated embedding-builder service.
+
+Run:
+
+```bash
+docker compose run embedding-builder
+```
+
+The generated file will be created at:
+
+```text
+models/xeno_commands.npz
+```
+
+After generating the file, start the application normally:
+
+```bash
+docker compose up xeno
+```
+
+### Important
+
+The embedding builder is a **development/build utility only**.
+
+It is not required to run the production application after `xeno_commands.npz` has been generated.
+
+---
+
+## 🔌 API
+
+### Chat API
+
+#### Endpoint
+
+```text
+POST /chatAiModel
+```
+
+#### Example Request
+
 ```json
 {
-  "Message":"Tell me the command to make directory in windows."
+    "message": "how do I create a database in mysql"
 }
 ```
-#### OUTPUT    # Status Code 200 OK
+
+#### Example Response
+
 ```json
 {
-  "Status":"Success",
-  "Message":"mkdir DIRECTORY_NAME"
-}
-```
-### Example2:
-#### INPUT
-```json
-{
-  "Message":"Hi"
-}
-```
-#### OUTPUT    # Status Code 200 OK
-```json
-{
-  "Status":"Success",
-  "Message":"Hello! How can I help you today?"
+    "response": "CREATE DATABASE database_name;"
 }
 ```
 
-## Project Architecture
-- chatbot_api        # root directory
-- chatbot_api/run.py
-- chatbot_api/venv
-- chatbot_api/.gitignore
-- chatbot_api/.env
-- chatbot_api/config.py
-- chatbot_api/.dockerignore
-- chatbot_api/Dockerfile
-- chatbot_api/requirements.txt
-- chatbot_api/app/models
-- chatbot_api/app/routes
-- chatbot_api/app/static
-- chatbot_api/app/templates
-- chatbot_api/app/utils
-- chatbot_api/app/__init__.py
-- chatbot_api/app/extension.py
+The exact response depends on the command dictionary and semantic similarity result.
 
-## License
-This project is licensed under the MIT License — meaning you’re free to use, modify, and distribute the code with proper credit. The software is provided “as is” without any warranty. Feel free to use this chatbot offline or integrate it into your own projects!
+---
 
-## Note
-This is an independent project licensed under MIT. Not affiliated with any existing product or brand named ‘Xeno’.
+## 🧮 Mathematical Operations
 
-## Author
-Pritanshu Srivastava | pritanshusrivastava24880@gmail.com | [LinkedIn](https://www.linkedin.com/in/pritanshu-srivastava-59aaa7226/) | [HackerRank](hackerrank.com/profile/pritanshusrivas1)
+Xeno also supports mathematical and expression-based queries.
+
+Examples include:
+
+```text
+10 + 20
+5 * 8
+100 / 4
+2 ^ 5
+10 & 3
+20 | 5
+```
+
+The application contains dedicated handling for:
+
+- Number-based calculations
+- Mathematical expressions
+- Operators
+- Bitwise operations
+
+---
+
+## 🌐 News and Date/Time Features
+
+Xeno supports special command handling for:
+
+- News queries
+- Current time
+- Current date
+- Timezone-aware responses
+
+These commands are handled separately from the standard semantic command matching flow where required.
+
+---
+
+## 📊 Performance Monitoring
+
+During development and deployment testing, Xeno includes memory and execution-time logging.
+
+The application tracks:
+
+- Application startup memory
+- Model initialization memory
+- Command embedding loading
+- Query embedding execution time
+- Semantic search execution time
+- Runtime memory usage
+
+Example:
+
+```text
+[MEMORY] ...
+```
+
+This instrumentation was used to compare the V1 and V2 resource footprint.
+
+---
+
+## 🚂 Railway Deployment
+
+Xeno is designed to be deployable using Docker on Railway.
+
+The production deployment uses the root:
+
+```text
+Dockerfile
+```
+
+The production application does not run the embedding-builder service.
+
+The required production artifacts are already included in the repository:
+
+```text
+app/models/all-MiniLM-L6-v2/model.onnx
+app/models/all-MiniLM-L6-v2/tokenizer.json
+models/xeno_commands.npz
+```
+
+Therefore, Railway can start the application directly without running the embedding-generation process.
+
+---
+
+## 🔄 V1 → V2 Changes
+
+### Removed from Production
+
+The production application no longer requires:
+
+```text
+SentenceTransformer
+PyTorch
+Transformers
+Scikit-learn
+SciPy
+```
+
+for semantic command inference.
+
+### Added
+
+```text
+ONNX Runtime
+Hugging Face Tokenizers
+NumPy-based similarity search
+Precomputed command embeddings
+Dedicated embedding-builder service
+```
+
+### Architecture Change
+
+#### V1
+
+```text
+Application Startup
+      │
+      ▼
+Load SentenceTransformer
+      │
+      ▼
+Load PyTorch
+      │
+      ▼
+Generate 1,522 embeddings
+      │
+      ▼
+Start Application
+```
+
+#### V2
+
+```text
+Build Time
+    │
+    ▼
+Generate command embeddings once
+    │
+    ▼
+Store xeno_commands.npz
+    │
+    │
+    ▼
+Production Startup
+    │
+    ▼
+Load ONNX Model
+    │
+    ▼
+Load Precomputed Embeddings
+    │
+    ▼
+Ready
+```
+
+---
+
+## 📈 V1 vs V2
+
+| Area | V1 | V2 |
+|---|---|---|
+| Embedding Model | SentenceTransformer | ONNX Runtime |
+| Model | all-MiniLM-L6-v2 | all-MiniLM-L6-v2 |
+| PyTorch | Required | Removed from production |
+| Transformers | Required | Removed from production |
+| Command Embeddings | Generated at startup | Precomputed |
+| Stored Embeddings | No | `.npz` |
+| Similarity Search | SentenceTransformer utility | NumPy |
+| Production Inference | Heavy ML stack | Lightweight ONNX |
+| Command Count | 1,522 | 1,522 |
+| Embedding Dimension | 384 | 384 |
+| Observed Startup RSS | ~804 MB | ~202 MB |
+| Embedding Builder | Part of application flow | Separate Docker utility |
+
+---
+
+## 💡 Design Decisions
+
+### Why precompute embeddings?
+
+The command dictionary changes much less frequently than user queries.
+
+Generating embeddings for all commands every time the application starts is unnecessary overhead.
+
+Instead:
+
+```text
+Commands
+   ↓
+Generate embeddings once
+   ↓
+Store embeddings
+   ↓
+Load during application startup
+```
+
+Only the incoming user query requires embedding generation at runtime.
+
+---
+
+### Why ONNX Runtime?
+
+ONNX Runtime allows the MiniLM model to run without loading the complete PyTorch/SentenceTransformers stack into the production application.
+
+This significantly reduces the production memory footprint while retaining the same underlying embedding model.
+
+---
+
+### Why NumPy?
+
+Only around 1,522 command embeddings are stored.
+
+For this dataset size, a simple NumPy similarity search is sufficient and avoids introducing a separate vector database or external service.
+
+---
+
+### Why not use a vector database?
+
+The current command dataset is small enough that introducing a vector database would add unnecessary:
+
+- Infrastructure
+- Memory usage
+- Network overhead
+- Deployment complexity
+
+The embeddings can comfortably be stored and searched locally using NumPy.
+
+---
+
+## 🔒 Offline Capability
+
+After the required model files and precomputed embeddings are present, semantic command matching can run locally without requiring an external vector database or online embedding API.
+
+Required model files:
+
+```text
+app/models/all-MiniLM-L6-v2/model.onnx
+app/models/all-MiniLM-L6-v2/tokenizer.json
+```
+
+Required command embeddings:
+
+```text
+models/xeno_commands.npz
+```
+
+---
+
+## 🧩 Extending the Command Dictionary
+
+New commands can be added to the command dictionaries used by Xeno.
+
+When command keys are changed or added, regenerate the precomputed embeddings:
+
+```bash
+docker compose run embedding-builder
+```
+
+This updates:
+
+```text
+models/xeno_commands.npz
+```
+
+Commit the regenerated file together with the command-dictionary changes.
+
+---
+
+## 🧪 Testing
+
+After starting the application, test the chatbot using natural-language variations of supported commands.
+
+Examples:
+
+```text
+What is a database?
+How do I create a database in MySQL?
+What command creates a table in MySQL?
+What is the current time?
+What is today's date?
+Calculate 25 * 4
+```
+
+Semantic matching allows different phrasings of supported commands to map to the corresponding predefined command.
+
+---
+
+## 🚀 Future Improvements
+
+Potential future improvements include:
+
+- Further memory optimization
+- Cleanup of temporary development profiling/logging code
+- Improved semantic matching thresholds
+- Additional command coverage
+- Improved query normalization
+- More robust intent classification
+- Continuous application availability improvements
+- Additional lightweight AI capabilities
+
+---
+
+## 👨‍💻 Author
+
+**Pritanshu Srivastava**
+
+AI Software Engineer | Applied AI Engineer | GenAI | RAG | LLM Systems | Python Backend Developer
+
+- **LinkedIn:** https://www.linkedin.com/in/pritanshu-srivastava-59aaa7226/
+- **GitHub:** https://github.com/Ethertyson
+- **HackerRank:** https://hackerrank.com/profile/pritanshusrivas1
+
+---
+
+## 📄 License
+
+This project is intended for learning, experimentation, and personal development purposes.
+
+---
+
+## ⭐ Xeno V2
+
+Xeno V2 focuses on keeping the chatbot architecture simple and deployment-friendly while significantly reducing the production memory footprint through:
+
+```text
+ONNX Runtime
+      +
+Precomputed Embeddings
+      +
+NumPy Similarity Search
+      +
+Lightweight Flask Backend
+```
+
+**From a heavy startup embedding pipeline to a lightweight production semantic-search architecture.**

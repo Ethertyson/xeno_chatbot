@@ -1,0 +1,20 @@
+services:
+
+  xeno:
+    image: xeno-chatbot:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xeno
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./logs:/app/logs
+
+  embedding-builder:
+    build:
+      context: .
+      dockerfile: docker/embedding-builder/Dockerfile
+    container_name: xeno-embedding-builder
+    volumes:
+      - ./models:/build/models
