@@ -4,6 +4,10 @@ Backend-focused full-stack chatbot application built with **Python, Flask, seman
 
 Xeno V2 focuses on reducing production memory usage while preserving the existing chatbot functionality and semantic command-matching behavior.
 
+## 🌐 Live Demo
+
+🚀 **[Try Xeno Chatbot Live](https://xenochatbot-production.up.railway.app/)**
+
 ---
 
 ## 🚀 Overview
