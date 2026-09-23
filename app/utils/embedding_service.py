@@ -3,7 +3,7 @@ import os
 import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
-from app.utils.memory_utils import log_memory
+from app.utils.logger import logger
 
 
 class EmbeddingService:
@@ -99,13 +99,13 @@ class EmbeddingService:
             for output in self.session.get_outputs()
         ]
 
-        log_memory(
-            "ONNX input names:",
+        logger.info(
+            "ONNX input names: %s",
             self.input_names,
         )
 
-        log_memory(
-            "ONNX output names:",
+        logger.info(
+            "ONNX output names: %s",
             self.output_names,
         )
 
@@ -118,6 +118,16 @@ class EmbeddingService:
             attention_mask
             token_type_ids
         """
+
+        self.tokenizer.enable_truncation(
+            max_length=128
+        )
+
+        self.tokenizer.enable_padding(
+            length=128,
+            pad_id=0,
+            pad_token="[PAD]",
+        )
 
         encoded = self.tokenizer.encode(
             text
